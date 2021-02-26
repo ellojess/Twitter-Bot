@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 
+	"github.com/ChimeraCoder/anaconda"
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
+	"github.com/sirupsen/logrus"
 )
 
 // Credentials stores all of our access/consumer tokens
@@ -50,6 +53,39 @@ func getClient(creds *Credentials) (*twitter.Client, error) {
 	return client, nil
 }
 
+func setupTwitterStream(creds *Credentials) {
+	anaconda.SetConsumerKey(creds.ConsumerKey)
+	anaconda.SetConsumerSecret(creds.ConsumerSecret)
+	api := anaconda.NewTwitterApi(creds.AccessToken, creds.AccessTokenSecret)
+	log := &logger{logrus.New()}
+	api.SetLogger(log)
+
+	stream := api.PublicStreamFilter(url.Values{
+		"track": []string{"#love"},
+	})
+
+	defer stream.Stop()
+
+	for v := range stream.C {
+		t, ok := v.(anaconda.Tweet)
+		if !ok {
+			log.Warningf("received unexpected value of type %T", v)
+			continue
+		}
+
+		if t.RetweetedStatus != nil {
+			continue
+		}
+
+		_, err := api.Retweet(t.Id, false)
+		if err != nil {
+			log.Errorf("could not retweet %d: %v", t.Id, err)
+			continue
+		}
+		log.Infof("retweeted %d", t.Id)
+	}
+}
+
 func main() {
 	fmt.Println("Go-Twitter Bot v0.01")
 	creds := Credentials{
@@ -69,6 +105,8 @@ func main() {
 
 	// fmt.Printf("%+v\n", client)
 
+	setupTwitterStream(&creds)
+
 	// testing status update
 	tweet, resp, err := client.Statuses.Update("Hello world!!", nil)
 	if err != nil {
@@ -78,5 +116,14 @@ func main() {
 	log.Printf("%+v\n", tweet)
 
 }
+
+type logger struct {
+	*logrus.Logger
+}
+
+func (log *logger) Critical(args ...interface{})                 { log.Error(args...) }
+func (log *logger) Criticalf(format string, args ...interface{}) { log.Errorf(format, args...) }
+func (log *logger) Notice(args ...interface{})                   { log.Info(args...) }
+func (log *logger) Noticef(format string, args ...interface{})   { log.Infof(format, args...) }
 
 // shoutouts: https://twitter.com/Elliot_F
