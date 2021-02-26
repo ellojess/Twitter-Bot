@@ -67,7 +67,15 @@ func main() {
 		log.Println(err)
 	}
 
-	fmt.Printf("%+v\n", client)
+	// fmt.Printf("%+v\n", client)
+
+	// testing status update
+	tweet, resp, err := client.Statuses.Update("Hello world!!", nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Printf("%+v\n", resp)
+	log.Printf("%+v\n", tweet)
 
 }
 
