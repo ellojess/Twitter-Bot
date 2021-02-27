@@ -61,7 +61,7 @@ func setupTwitterStream(creds *Credentials) {
 	api.SetLogger(log)
 
 	stream := api.PublicStreamFilter(url.Values{
-		"track": []string{"#love"},
+		"track": []string{"love"},
 	})
 
 	defer stream.Stop()
@@ -87,6 +87,7 @@ func setupTwitterStream(creds *Credentials) {
 }
 
 func main() {
+	// retrieve a new Twitter client
 	fmt.Println("Go-Twitter Bot v0.01")
 	creds := Credentials{
 		AccessToken:       os.Getenv("ACCESS_TOKEN"),
@@ -105,15 +106,39 @@ func main() {
 
 	// fmt.Printf("%+v\n", client)
 
-	setupTwitterStream(&creds)
+	// stream phrase or hashtag of choice
+	// setupTwitterStream(&creds)
+
+	// Search tweets to retweet
+	searchParams := &twitter.SearchTweetParams{
+		Query:      "software",
+		Count:      5,
+		ResultType: "trending",
+		Lang:       "en",
+	}
+
+	searchResult, _, _ := client.Search.Tweets(searchParams)
+
+	// Retweet
+	for _, tweet := range searchResult.Statuses {
+		tweetID := tweet.ID
+		client.Statuses.Retweet(tweetID, &twitter.StatusRetweetParams{})
+		if err != nil {
+			log.Println(err)
+		}
+		// log.Printf("%+v\n", resp)
+		log.Printf("%+v\n", tweet)
+
+		fmt.Printf("RETWEETED: %+v\n", tweet.Text)
+	}
 
 	// testing status update
-	tweet, resp, err := client.Statuses.Update("Hello world!!", nil)
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("%+v\n", resp)
-	log.Printf("%+v\n", tweet)
+	// tweet, resp, err := client.Statuses.Update("Hello world!!", nil)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// log.Printf("%+v\n", resp)
+	// log.Printf("%+v\n", tweet)
 
 }
 
