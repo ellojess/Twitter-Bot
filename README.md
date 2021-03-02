@@ -1,4 +1,4 @@
-# Twitter-Bot
+# Twitter-Bot ![Go Report Card](https://goreportcard.com/badge/github.com/ellojess/Twitter-Bot)
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
