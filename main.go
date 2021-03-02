@@ -61,7 +61,7 @@ func setupTwitterStream(creds *Credentials) {
 	api.SetLogger(log)
 
 	stream := api.PublicStreamFilter(url.Values{
-		"track": []string{"love"},
+		"track": []string{"#code"},
 	})
 
 	defer stream.Stop()
@@ -107,12 +107,12 @@ func main() {
 	// fmt.Printf("%+v\n", client)
 
 	// stream phrase or hashtag of choice
-	// setupTwitterStream(&creds)
+	setupTwitterStream(&creds)
 
 	// Search tweets to retweet
 	searchParams := &twitter.SearchTweetParams{
-		Query:      "software",
-		Count:      5,
+		Query:      "#coding",
+		Count:      3,
 		ResultType: "trending",
 		Lang:       "en",
 	}
