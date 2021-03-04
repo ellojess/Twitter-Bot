@@ -6,15 +6,14 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/ChimeraCoder/anaconda"
-	"github.com/dghubble/go-twitter/twitter"
-	"github.com/dghubble/oauth1"
-	"github.com/sirupsen/logrus"
+	"github.com/ChimeraCoder/anaconda"       // for accessing version 1.1 of the Twitter API
+	"github.com/dghubble/go-twitter/twitter" //  for providing a Client for the Twitter API
+	"github.com/dghubble/oauth1"             // authorization flow and provides an http.Client
+	"github.com/sirupsen/logrus"             // API compatible structured logger
 )
 
 // Credentials stores all of our access/consumer tokens
-// and secret keys needed for authentication against
-// the twitter REST API.
+// and secret keys needed for authentication for twitter REST API
 type Credentials struct {
 	ConsumerKey       string
 	ConsumerSecret    string
@@ -54,29 +53,41 @@ func getClient(creds *Credentials) (*twitter.Client, error) {
 }
 
 func setupTwitterStream(creds *Credentials) {
+	// authentication of Twitter API for anaconda
 	anaconda.SetConsumerKey(creds.ConsumerKey)
 	anaconda.SetConsumerSecret(creds.ConsumerSecret)
 	api := anaconda.NewTwitterApi(creds.AccessToken, creds.AccessTokenSecret)
+
+	// setup log for items recieved by anaconda
 	log := &logger{logrus.New()}
 	api.SetLogger(log)
 
+	// stream has access all public tweets from Twitter
+	// then filter the tweets based on a specific phrase or hashtag
 	stream := api.PublicStreamFilter(url.Values{
-		"track": []string{"#code"},
+		// here we're filtering for #coding
+		"track": []string{"lol"},
 	})
 
+	// stop at the end of program
 	defer stream.Stop()
 
+	// access channel(C)
 	for v := range stream.C {
+		// check that the value recieved from channel C is of type anaconda.Tweet
 		t, ok := v.(anaconda.Tweet)
 		if !ok {
 			log.Warningf("received unexpected value of type %T", v)
 			continue
 		}
 
+		// check if a tweet has already been retweeted
+		// if it has then do not retweet and continue stream
 		if t.RetweetedStatus != nil {
 			continue
 		}
 
+		// retweet specific tweet(Id)
 		_, err := api.Retweet(t.Id, false)
 		if err != nil {
 			log.Errorf("could not retweet %d: %v", t.Id, err)
@@ -88,7 +99,7 @@ func setupTwitterStream(creds *Credentials) {
 
 func main() {
 	// retrieve a new Twitter client
-	fmt.Println("Go-Twitter Bot v0.01")
+	// get credentials from environment
 	creds := Credentials{
 		AccessToken:       os.Getenv("ACCESS_TOKEN"),
 		AccessTokenSecret: os.Getenv("ACCESS_TOKEN_SECRET"),
@@ -96,7 +107,7 @@ func main() {
 		ConsumerSecret:    os.Getenv("CONSUMER_SECRET"),
 	}
 
-	fmt.Printf("%+v\n", creds)
+	// fmt.Printf("%+v\n", creds) // verify personal twitter information in terminal
 
 	client, err := getClient(&creds)
 	if err != nil {
@@ -104,12 +115,10 @@ func main() {
 		log.Println(err)
 	}
 
-	// fmt.Printf("%+v\n", client)
-
 	// stream phrase or hashtag of choice
 	setupTwitterStream(&creds)
 
-	// Search tweets to retweet
+	// search tweets to retweet determined by searchParams
 	searchParams := &twitter.SearchTweetParams{
 		Query:      "#coding",
 		Count:      3,
@@ -117,9 +126,10 @@ func main() {
 		Lang:       "en",
 	}
 
+	// pass searchParams to search function
 	searchResult, _, _ := client.Search.Tweets(searchParams)
 
-	// Retweet
+	// retweet
 	for _, tweet := range searchResult.Statuses {
 		tweetID := tweet.ID
 		client.Statuses.Retweet(tweetID, &twitter.StatusRetweetParams{})
@@ -131,21 +141,13 @@ func main() {
 
 		fmt.Printf("RETWEETED: %+v\n", tweet.Text)
 	}
-
-	// testing status update
-	// tweet, resp, err := client.Statuses.Update("Hello world!!", nil)
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	// log.Printf("%+v\n", resp)
-	// log.Printf("%+v\n", tweet)
-
 }
 
 type logger struct {
 	*logrus.Logger
 }
 
+// critical methods for logger -- do not remove
 func (log *logger) Critical(args ...interface{})                 { log.Error(args...) }
 func (log *logger) Criticalf(format string, args ...interface{}) { log.Errorf(format, args...) }
 func (log *logger) Notice(args ...interface{})                   { log.Info(args...) }
