@@ -1,5 +1,23 @@
 # Twitter-Bot ![Go Report Card](https://goreportcard.com/badge/github.com/ellojess/Twitter-Bot)
 
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="https://logos-world.net/wp-content/uploads/2020/04/Twitter-Logo.png" alt="Logo" height="280">
+  </a>
+
+  <p align="center">
+    <br />
+    <br />
+    <a href="https://drive.google.com/file/d/1XTezAZvB1EM4Gb54J7O92yTlc_F8Z0rw/view?usp=sharing">View Demo & Code Walkthrough</a>
+    ·
+    <a href="https://github.com/ellojess/Twitter-Bot/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/ellojess/Twitter-Bot/issues">Request Feature</a>
+  </p>
+</p>
+
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary>Table of Contents</summary>
@@ -127,6 +145,13 @@ Contributions are what make the open source community such an amazing place to b
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request using this [template](https://github.com/embeddedartistry/templates/blob/master/oss_docs/PULL_REQUEST_TEMPLATE.md)
+
+
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
 
 
 
