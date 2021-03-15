@@ -1,12 +1,6 @@
 # Twitter-Bot ![Go Report Card](https://goreportcard.com/badge/github.com/ellojess/Twitter-Bot)
 
 <!-- PROJECT LOGO -->
-<br />
-<p align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="https://logos-world.net/wp-content/uploads/2020/04/Twitter-Logo.png" alt="Logo" height="280">
-  </a>
-
   <p align="center">
     <br />
     <br />
